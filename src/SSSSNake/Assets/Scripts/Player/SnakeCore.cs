@@ -1,74 +1,82 @@
 ﻿using Assets.Scripts.Player.Tails;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
-using Unity.Mathematics;
-
-using Random = UnityEngine.Random;
+using static SnakeCore.MoveDirection;
 
 public class SnakeCore : MonoBehaviour
 {
-	[Header("Debug")] 
-	public Sprite spriter;
-	public Transform borderL;
-	public RectTransform debugRect;
+	public int Length;
 
+	public Tail[] Tails;
+	public List<Vector2> Positions = new List<Vector2>();
 
-	public GameObject[,] grid;
+	public float FPS;
 
-	[Header("Information"), Space(5)] 
-	public int vertical;
-	public int horizontal;
-	public int rows, columns;
+	public float w;
 
-	private void Awake()
+	public MoveDirection Direction = Up;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+		InvokeRepeating(nameof(MovePlayer), 0, 60 / 60 / FPS);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+		if (Input.GetKeyUp(KeyCode.W))
+			Direction = Up;
+		else if (Input.GetKeyUp(KeyCode.S))
+			Direction = Down;
+		else if (Input.GetKeyUp(KeyCode.A))
+			Direction = Left;
+		else if (Input.GetKeyUp(KeyCode.D))
+			Direction = Right;
+
+    }
+
+	public void MovePlayer()
 	{
-		debugRect = borderL.GetComponent<RectTransform>();
-		//rect.rect.position = rect.anchoredPosition;
+		Move(Direction, 1);
 	}
 
-	public void Start()
+    public void Move(MoveDirection direction, int steps)
 	{
-		if (!(Camera.main is Camera cam && debugRect.rect is Rect r)) return;
+        Vector2 pos = Vector2.zero;
 
-		var b = cam.ScreenToWorldPoint(new Vector2(0, 0));
-
-
-		vertical = (int)Camera.main.orthographicSize;
-		horizontal = vertical * (Screen.width / Screen.height);
-		columns = horizontal * 2;
-		rows = vertical * 2;
-		grid = new GameObject[columns, rows];
-		for (var i = 0; i < columns; i++)
+		switch (direction)
 		{
-			for (var j = 0; j < rows; j++)
-			{
-				SpawnTile(i, j, out grid[i, j]);
-			}
+			case Left:
+				pos = Vector2.left;
+				break;
+			case Right:
+				pos = Vector2.right;
+				break;
+			case Up:
+				pos = Vector2.up;
+				break;
+			case Down:
+				pos = Vector2.down;
+				break;
 		}
+
+		var p = transform.localPosition += (Vector3)((pos * w) * steps);
+		if (Positions.Count >= 10)
+		{
+			Positions.Insert(0, p);
+			Positions.RemoveAt(Positions.Count - 1);
+		}
+		else
+			Positions.Add(p);
 	}
 
-	private void SpawnTile(int x, int y, out GameObject value)
+	public enum MoveDirection
 	{
-		if (!(Camera.main is Camera cam && debugRect.rect is Rect r))
-		{
-			value = null;
-			return;
-		}
-
-		var b = cam.ScreenToWorldPoint(new Vector2(0, 0));
-		b -= borderL.position;
-
-		var obj = new GameObject($"Tile_{x}_{y}");
-
-		var spr = obj.AddComponent<SpriteRenderer>();
-		spr.sprite = spriter;
-		spr.color = Color.black;
-
-		obj.AddComponent<Tail>();
-		obj.transform.position = new Vector2(x - (horizontal - 0.5f), y - (vertical - 0.5f));
-		value = obj;
+        Left,
+        Right,
+        Up,
+        Down
 	}
 }
