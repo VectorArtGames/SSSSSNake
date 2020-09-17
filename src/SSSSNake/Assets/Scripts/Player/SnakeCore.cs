@@ -18,13 +18,13 @@ public class SnakeCore : MonoBehaviour
 	public MoveDirection Direction = Up;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
 		InvokeRepeating(nameof(MovePlayer), 0, 60 / 60 / FPS);
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
 		if (Input.GetKeyUp(KeyCode.W))
 			Direction = Up;
@@ -62,7 +62,7 @@ public class SnakeCore : MonoBehaviour
 				break;
 		}
 
-		var p = transform.localPosition += (Vector3)((pos * w) * steps);
+		var p = transform.localPosition += (Vector3)(pos * (w * steps));
 		if (Positions.Count >= 10)
 		{
 			Positions.Insert(0, p);
@@ -70,7 +70,16 @@ public class SnakeCore : MonoBehaviour
 		}
 		else
 			Positions.Add(p);
+
+		OnSnakeMove();
 	}
+
+    public void OnSnakeMove()
+    {
+	    if (!(BorderField.Instance is BorderField instance)) return;
+	    var border = instance.Border;
+		border.
+    }
 
 	public enum MoveDirection
 	{

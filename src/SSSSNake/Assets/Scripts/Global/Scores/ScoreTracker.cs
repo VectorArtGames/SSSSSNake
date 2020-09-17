@@ -51,7 +51,7 @@ public class ScoreTracker : MonoBehaviour
 
 	private void Start()
 	{
-		Score = 9999;
+		Score = 0;
 	}
 
 	public void UpdateText()
