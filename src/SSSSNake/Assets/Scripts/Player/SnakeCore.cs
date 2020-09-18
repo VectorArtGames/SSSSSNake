@@ -78,8 +78,35 @@ public class SnakeCore : MonoBehaviour
     {
 	    if (!(BorderField.Instance is BorderField instance)) return;
 	    var border = instance.Border;
-		border.
-    }
+
+		// Left
+		if (border.x - w > transform.localPosition.x)
+		{
+			transform.localPosition = 
+				new Vector2((int)border.width, (int)transform.localPosition.y);
+		}
+
+		// Right
+		if (border.width + w < transform.localPosition.x)
+		{
+			transform.localPosition =
+				new Vector2((int)border.x, (int)transform.localPosition.y);
+		}
+
+		// Top
+		if (border.y + w < transform.localPosition.y)
+		{
+			transform.localPosition =
+				new Vector2(transform.localPosition.x, -border.y);
+		}
+
+		// Bottom
+		if (-border.height - w > transform.localPosition.y)
+		{
+			transform.localPosition =
+				new Vector2(transform.localPosition.x, border.y);
+		}
+	}
 
 	public enum MoveDirection
 	{
