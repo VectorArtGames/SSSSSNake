@@ -8,6 +8,7 @@ public class TailHandle : MonoBehaviour
 {
 	public GameObject TailObject;
 
+    [SerializeField]
     private int _length;
     public int Length
 	{
@@ -33,7 +34,9 @@ public class TailHandle : MonoBehaviour
 
     public void PositionUpdate(Vector3 p)
     {
-	    if (Positions.Count > Mathf.Max(10, Length))
+	    if (Length <= 0) return;
+
+	    if (Positions.Count > Length)
 	    {
 		    Positions.Insert(0, p);
 		    Positions.RemoveAt(Positions.Count - 1);
@@ -45,18 +48,15 @@ public class TailHandle : MonoBehaviour
     }
 
     public void OnPlayerMove()
-	{
+    {
+	    var pos = Positions.ToArray();
         if (Tails == null) return;
 
         for (var i = 0; i < Tails.Length - 1; i++)
         {
-            if (!(Positions.Count > i + 1 && Positions[i + 1] is Vector2 p))
-			{
-                Debug.Log($"Index:{i + 1}\nCount: {Positions.Count}");
-                return;
-            }
+	        if (!(pos.Length > i + 1 && pos[i + 1] is Vector2 p)) return;
 
-            if (SpawnTail(i)) return;
+	        if (SpawnTail(i)) continue;
 
             var t = Tails[i];
             t.UpdatePosition(p);
@@ -75,7 +75,8 @@ public class TailHandle : MonoBehaviour
 		if (Tails.Length < index || 
             Tails.Length >= index && 
             Tails[index] != null) return false;
-		Tails[index] = new Tail(obj);
+
+		Tails[index] = new Tail(this, obj, index);
         return true;
 	}
 
