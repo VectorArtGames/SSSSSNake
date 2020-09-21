@@ -1,15 +1,14 @@
-﻿using Assets.Scripts.Player.Tails;
+﻿using System;
+using Assets.Scripts.Player.Tails;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static SnakeCore.MoveDirection;
 
+[RequireComponent(typeof(TailHandle))]
 public class SnakeCore : MonoBehaviour
 {
-	public int Length;
-
-	public Tail[] Tails;
-	public List<Vector2> Positions = new List<Vector2>();
+	public TailHandle tail;
 
 	public float FPS;
 
@@ -17,10 +16,22 @@ public class SnakeCore : MonoBehaviour
 
 	public MoveDirection Direction = Up;
 
-    // Start is called before the first frame update
-    private void Start()
+	#region Singleton
+
+	public static SnakeCore Instance { get; set; }
+
+	private void Awake()
+	{
+		Instance = this;
+		TryGetComponent(out tail);
+	}
+
+	#endregion
+
+	// Start is called before the first frame update
+	private void Start()
     {
-		InvokeRepeating(nameof(MovePlayer), 0, 60 / 60 / FPS);
+		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / FPS);
     }
 
     // Update is called once per frame
@@ -43,68 +54,62 @@ public class SnakeCore : MonoBehaviour
 	}
 
     public void Move(MoveDirection direction, int steps)
-	{
-        Vector2 pos = Vector2.zero;
+    {
+	    var dir = GetDirection(direction);
 
-		switch (direction)
-		{
-			case Left:
-				pos = Vector2.left;
-				break;
-			case Right:
-				pos = Vector2.right;
-				break;
-			case Up:
-				pos = Vector2.up;
-				break;
-			case Down:
-				pos = Vector2.down;
-				break;
-		}
-
-		var p = transform.localPosition += (Vector3)(pos * (w * steps));
-		if (Positions.Count >= 10)
-		{
-			Positions.Insert(0, p);
-			Positions.RemoveAt(Positions.Count - 1);
-		}
-		else
-			Positions.Add(p);
-
+		var p = transform.localPosition += (Vector3)(dir * (w * steps));
 		OnSnakeMove();
+		tail.PositionUpdate(p);
+	}
+
+    private Vector2 GetDirection(MoveDirection direction)
+    {
+	    switch (direction)
+	    {
+		    case Left:
+			    return Vector2.left;
+		    case Right:
+			    return Vector2.right;
+		    case Up:
+			    return Vector2.up;
+		    case Down:
+			    return Vector2.down;
+	    }
+
+		return Vector2.zero;
 	}
 
     public void OnSnakeMove()
     {
-	    if (!(BorderField.Instance is BorderField instance)) return;
+	    if (!(BorderField.Instance is BorderField instance && transform is Transform t)) return;
 	    var border = instance.Border;
 
 		// Left
-		if (border.x - w > transform.localPosition.x)
+		if (border.x - w > t.localPosition.x)
 		{
-			transform.localPosition = 
-				new Vector2((int)border.width, (int)transform.localPosition.y);
+			t.localPosition = 
+				new Vector2((int)border.width + w, (int)t.localPosition.y);
 		}
 
 		// Right
-		if (border.width + w < transform.localPosition.x)
+		if (border.width + w < t.localPosition.x)
 		{
-			transform.localPosition =
-				new Vector2((int)border.x, (int)transform.localPosition.y);
+			t.localPosition =
+				new Vector2((int)border.x + w, (int)t.localPosition.y);
 		}
 
 		// Top
-		if (border.y + w < transform.localPosition.y)
+		if (border.y + w < t.localPosition.y)
 		{
-			transform.localPosition =
-				new Vector2(transform.localPosition.x, -border.y);
+			t.localPosition =
+				new Vector2(t.localPosition.x, -border.y - w);
 		}
 
 		// Bottom
-		if (-border.height - w > transform.localPosition.y)
+		if (-border.height - w > t.localPosition.y)
 		{
-			transform.localPosition =
-				new Vector2(transform.localPosition.x, border.y);
+			t.localPosition =
+				new Vector2(t.localPosition.x, border.y + w);
 		}
 	}
 

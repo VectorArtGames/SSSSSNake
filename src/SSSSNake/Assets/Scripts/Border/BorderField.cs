@@ -28,7 +28,14 @@ public class BorderField : MonoBehaviour
 
 	#endregion
 
+	#region Border_Update
+
 	private void Start()
+	{
+		UpdateBorder();
+	}
+
+	public void UpdateBorder()
 	{
 		var left = BorderLeft;
 		var top = BorderTop;
@@ -45,4 +52,12 @@ public class BorderField : MonoBehaviour
 
 		Border = rect;
 	}
+
+	public void OnRectTransformDimensionsChange()
+	{
+		UpdateBorder();
+		Debug.Log("test");
+	}
+
+	#endregion
 }
