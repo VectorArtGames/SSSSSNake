@@ -41,13 +41,11 @@ public class BorderField : MonoBehaviour
 		var top = BorderTop;
 
 		var x = left.localPosition.x;
-		Debug.Log(x);
 		var y = top.localPosition.y;
 
 
 		var width = BorderRight.localPosition.x;
 		var height = BorderTop.localPosition.y;
-		Debug.Log($"{width} x {height}");
 		var rect = new Rect(x, y, width, height);
 
 		Border = rect;
@@ -56,7 +54,6 @@ public class BorderField : MonoBehaviour
 	public void OnRectTransformDimensionsChange()
 	{
 		UpdateBorder();
-		Debug.Log("test");
 	}
 
 	#endregion

@@ -14,47 +14,79 @@ public class TailHandle : MonoBehaviour
         get => _length;
         set
         {
-            OnLengthChanged(_length, value);
+            var old = _length;
 	        _length = value;
             Array.Resize(ref Tails, value);
+            OnLengthChanged(old, value);
         }
 	}
 
     public Tail[] Tails;
     public List<Vector2> Positions = new List<Vector2>();
 
+    public Queue<Tail> SpawnTails = new Queue<Tail>();
+
     private void OnLengthChanged(int old, int current)
     {
-        SpawnTail(current);
+        
     }
 
     public void PositionUpdate(Vector3 p)
     {
-	    if (Positions.Count >= Mathf.Max(10, Length))
+	    if (Positions.Count > Mathf.Max(10, Length))
 	    {
 		    Positions.Insert(0, p);
 		    Positions.RemoveAt(Positions.Count - 1);
 	    }
 	    else
 		    Positions.Add(p);
+
+        OnPlayerMove();
     }
 
-    private void FixedUpdate()
-    {
-	    for (var i = 0; i < Tails.Length; i++)
-	    {
-		    var t = Tails[i];
-		    if (t == null) continue;
-		    var p = Positions[i];
+    public void OnPlayerMove()
+	{
+        if (Tails == null) return;
+
+        for (var i = 0; i < Tails.Length - 1; i++)
+        {
+            if (!(Positions.Count > i + 1 && Positions[i + 1] is Vector2 p))
+			{
+                Debug.Log($"Index:{i + 1}\nCount: {Positions.Count}");
+                return;
+            }
+
+            if (SpawnTail(i)) return;
+
+            var t = Tails[i];
             t.UpdatePosition(p);
-	    }
+        }
     }
 
-    private void SpawnTail(int index)
+    private bool SpawnTail(int index)
     {
-	    var obj = Instantiate(TailObject, Positions[index], Quaternion.identity);
-	    if (Tails.Length > index) return;
+        if (Tails.Length >= index && Tails[index] != null) return false;
 
-	    Tails[index] = new Tail(obj);
-    }
+        if (Positions.Count < index ) return false;
+
+	    var obj = Instantiate(TailObject, transform.parent, false);
+        obj.SetActive(false);
+
+		if (Tails.Length < index || 
+            Tails.Length >= index && 
+            Tails[index] != null) return false;
+		Tails[index] = new Tail(obj);
+        return true;
+	}
+
+	private void Start()
+	{
+        Length = 5;
+        InvokeRepeating(nameof(Increment), 0, 3);
+	}
+
+    private void Increment()
+	{
+        Length++;
+	}
 }

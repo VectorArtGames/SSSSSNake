@@ -14,9 +14,11 @@ namespace Assets.Scripts.Player.Tails
 		public Tail(GameObject tailObject) =>
 			(TailObject) = (tailObject);
 
+
 		public void UpdatePosition(Vector3 pos)
 		{
 			TailObject.transform.localPosition = pos;
+			TailObject.SetActive(true);
 		}
 	}
 }
