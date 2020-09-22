@@ -20,6 +20,7 @@ namespace Assets.Scripts.Player.Tails
 
 		public void UpdatePosition(Vector3 pos)
 		{
+			if (TailObject == null) return;
 			TailObject.transform.localPosition = pos;
 			TailObject.SetActive(true);
 		}

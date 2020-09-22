@@ -44,7 +44,7 @@ public class TailHandle : MonoBehaviour
 	    else
 		    Positions.Add(p);
 
-        OnPlayerMove();
+		OnPlayerMove();
     }
 
     public void OnPlayerMove()
