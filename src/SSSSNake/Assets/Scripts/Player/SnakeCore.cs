@@ -97,7 +97,7 @@ public class SnakeCore : MonoBehaviour
 		if (border.width + w < t.localPosition.x)
 		{
 			t.localPosition =
-				new Vector2((int)border.x + w, (int)t.localPosition.y);
+				new Vector2((int)border.x - w, (int)t.localPosition.y);
 		}
 
 		// Top

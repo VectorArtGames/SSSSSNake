@@ -12,16 +12,24 @@ namespace Assets.Scripts.Player.Tails
 	{
 		public TailHandle Handle;
 		public GameObject TailObject;
+		public RectTransform rect;
 		public int Index;
 
-		public Tail(TailHandle handle, GameObject tailObject, int index) =>
-			(Handle, TailObject, Index) = (handle, tailObject, index);
-
-
-		public void UpdatePosition(Vector3 pos)
+		public Tail(TailHandle handle, GameObject tailObject, int index)
 		{
-			if (TailObject == null) return;
-			TailObject.transform.localPosition = pos;
+			(Handle, TailObject, Index) = (handle, tailObject, index);
+			tailObject.TryGetComponent(out rect);
+		}
+
+
+		public void UpdatePosition()
+		{
+			if (TailObject == null || Handle == null) return;
+			if (TailObject.transform == null) return;
+			if (Handle != null && Handle.Positions.Count <= Index + 1) return;
+			if (!(Handle.Positions[Index + 1] is Vector2 p)) return;
+
+			TailObject.transform.localPosition = p;
 			TailObject.SetActive(true);
 		}
 	}

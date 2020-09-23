@@ -7,6 +7,7 @@ using UnityEngine;
 public class TailHandle : MonoBehaviour
 {
 	public GameObject TailObject;
+	public Transform TailContainer;
 
     [SerializeField]
     private int _length;
@@ -15,79 +16,87 @@ public class TailHandle : MonoBehaviour
         get => _length;
         set
         {
-            var old = _length;
+			if (value < 0) return;
+			var old = _length;
 	        _length = value;
-            Array.Resize(ref Tails, value);
-            OnLengthChanged(old, value);
-        }
+			DestroyLeftover(old, value);
+		}
 	}
 
     public Tail[] Tails;
     public List<Vector2> Positions = new List<Vector2>();
 
-    public Queue<Tail> SpawnTails = new Queue<Tail>();
+	private void DestroyLeftover(int old, int current)
+	{
+		var remainder = old - current;
+		if (remainder <= 0)
+		{
+			Array.Resize(ref Tails, current);
+			TailUpdate();
+			return;
+		}
 
-    private void OnLengthChanged(int old, int current)
-    {
-        
-    }
+		for (var i = 0; i < remainder; i++)
+		{
+			if (!(Tails[Tails.Length - (1 + i)] is Tail t && t.TailObject is GameObject obj))
+			{
+				Array.Resize(ref Tails, current);
+				TailUpdate();
+				return;
+			}
 
-    public void PositionUpdate(Vector3 p)
+			Destroy(obj);
+		}
+
+		Array.Resize(ref Tails, current);
+		TailUpdate();
+	}
+	/* TODO Optimization - Move only the last object to the first position, Increment by X (steps)
+	 */
+	public void PositionUpdate(Vector3 p)
     {
 	    if (Length <= 0) return;
 
-	    if (Positions.Count > Length)
-	    {
-		    Positions.Insert(0, p);
-		    Positions.RemoveAt(Positions.Count - 1);
-	    }
-	    else
-		    Positions.Add(p);
+		Positions.Insert(0, p);
 
-		OnPlayerMove();
+	    if (Positions.Count > Length + 1)
+		{
+			while (Positions.Count > Length + 1)
+			{
+				Positions.RemoveAt(Positions.Count - 1);
+			}
+		}
+
+		TailUpdate();
     }
 
-    public void OnPlayerMove()
-    {
-	    var pos = Positions.ToArray();
-        if (Tails == null) return;
+	private void TailUpdate()
+	{
+		if (TailContainer == null) return;
 
-        for (var i = 0; i < Tails.Length - 1; i++)
-        {
-	        if (!(pos.Length > i + 1 && pos[i + 1] is Vector2 p)) return;
-
-	        if (SpawnTail(i)) continue;
-
-            var t = Tails[i];
-            t.UpdatePosition(p);
-        }
-    }
-
-    private bool SpawnTail(int index)
-    {
-        if (Tails.Length >= index && Tails[index] != null) return false;
-
-        if (Positions.Count < index ) return false;
-
-	    var obj = Instantiate(TailObject, transform.parent, false);
-        obj.SetActive(false);
-
-		if (Tails.Length < index || 
-            Tails.Length >= index && 
-            Tails[index] != null) return false;
-
-		Tails[index] = new Tail(this, obj, index);
-        return true;
+		for (var i = 0; i < Length; i++)
+		{
+			var index = i;
+			if (Tails[index] == null)
+			{
+				var obj = Instantiate(TailObject, TailContainer, false);
+				obj.transform.localPosition = Vector2.zero;
+				Tails[index] = new Tail(this, obj, index);
+			}
+			else
+			{
+				Tails[index].UpdatePosition();
+			}
+		}
 	}
 
 	private void Start()
 	{
-        Length = 5;
-        InvokeRepeating(nameof(Increment), 0, 3);
+        InvokeRepeating(nameof(Increment), 0, 0.5f);
 	}
 
     private void Increment()
 	{
-        Length++;
+		Length++;
 	}
 }
