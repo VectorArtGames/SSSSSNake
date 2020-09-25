@@ -70,7 +70,7 @@ public class TailHandle : MonoBehaviour
 		TailUpdate();
     }
 
-	private void TailUpdate()
+	public void TailUpdate()
 	{
 		if (TailContainer == null) return;
 
@@ -81,6 +81,7 @@ public class TailHandle : MonoBehaviour
 			{
 				var obj = Instantiate(TailObject, TailContainer, false);
 				obj.transform.localPosition = Vector2.zero;
+				obj.SetActive(false);
 				Tails[index] = new Tail(this, obj, index);
 			}
 			else
