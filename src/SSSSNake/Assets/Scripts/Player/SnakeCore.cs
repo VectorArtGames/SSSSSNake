@@ -55,13 +55,16 @@ public class SnakeCore : MonoBehaviour
 
     public void Move(MoveDirection direction, int steps)
     {
-	    var dir = GetDirection(direction);
+	    if (!(transform is Transform t)) return;
 
-		var p = transform.localPosition += (Vector3)(dir * (w * steps));
+	    var dir = GetDirection(direction);
+		var p = t.localPosition + (Vector3)(dir * (w * steps));
 		OnSnakeMove();
 
 		if (!(tail is TailHandle handle)) return;
-		handle.PositionUpdate(p);
+		handle.Tails
+		t.localPosition = p;
+		handle.PositionUpdate(p, steps);
 	}
 
     private Vector2 GetDirection(MoveDirection direction)

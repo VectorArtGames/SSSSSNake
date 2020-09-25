@@ -53,7 +53,7 @@ public class TailHandle : MonoBehaviour
 	}
 	/* TODO Optimization - Move only the last object to the first position, Increment by X (steps)
 	 */
-	public void PositionUpdate(Vector3 p)
+	public void PositionUpdate(Vector3 p, int steps)
     {
 	    if (Length <= 0) return;
 

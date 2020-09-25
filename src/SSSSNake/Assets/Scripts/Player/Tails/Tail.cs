@@ -13,6 +13,8 @@ namespace Assets.Scripts.Player.Tails
 		public TailHandle Handle;
 		public GameObject TailObject;
 		public RectTransform rect;
+		public Vector3 position;
+
 		public int Index;
 
 		public Tail(TailHandle handle, GameObject tailObject, int index)
@@ -30,6 +32,7 @@ namespace Assets.Scripts.Player.Tails
 			if (!(Handle.Positions[Index + 1] is Vector2 p)) return;
 
 			TailObject.transform.localPosition = p;
+			position = p;
 			TailObject.SetActive(true);
 		}
 	}
