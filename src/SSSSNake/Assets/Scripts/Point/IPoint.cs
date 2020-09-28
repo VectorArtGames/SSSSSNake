@@ -10,6 +10,7 @@ namespace Assets.Scripts.Point
 	public interface IPoint
 	{
 		GameObject AttachedObject { get; set; }
-		bool CanCollect(Vector2 point);
+		bool Collected { get; set; }
+		bool CanCollect(Vector2 point, Vector2 size);
 	}
 }

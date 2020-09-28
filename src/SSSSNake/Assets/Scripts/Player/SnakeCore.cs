@@ -11,6 +11,7 @@ using Assets.Scripts.Point;
 public class SnakeCore : MonoBehaviour
 {
 	public TailHandle tail;
+	public ScoreTracker score;
 
 	public float FPS;
 
@@ -33,6 +34,7 @@ public class SnakeCore : MonoBehaviour
 	// Start is called before the first frame update
 	private void Start()
 	{
+		score = ScoreTracker.Instance;
 		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / FPS);
 	}
 
@@ -72,9 +74,8 @@ public class SnakeCore : MonoBehaviour
 		t.localPosition = p;
 		handle.PositionUpdate(p, steps);
 		OnSnakeMove();
-		if (!(PointHandler.Instance is PointHandler pHandle && pHandle.point is Point point)) return;
-		Debug.Log(point.CanCollect(p) ? "Collecting" : "NOPE");
-		Debug.Log("Yes");
+		if (!(PointHandler.Instance is PointHandler pHandle && pHandle.point is Point point && score != null)) return;
+		point.CanCollect(p, new Vector2(w, w));
 	}
 
 	private Vector2 GetDirection(MoveDirection direction)

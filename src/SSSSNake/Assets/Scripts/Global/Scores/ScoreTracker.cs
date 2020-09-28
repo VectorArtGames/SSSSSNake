@@ -39,11 +39,6 @@ public class ScoreTracker : MonoBehaviour
 		}
 	}
 
-	private void FixedUpdate()
-	{
-		Score++;
-	}
-
 	public void Restart()
 	{
 		Score = 0;

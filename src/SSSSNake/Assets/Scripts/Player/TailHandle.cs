@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class TailHandle : MonoBehaviour
 {
+
 	public GameObject TailObject;
 	public Transform TailContainer;
 
@@ -89,15 +90,5 @@ public class TailHandle : MonoBehaviour
 				Tails[index].UpdatePosition();
 			}
 		}
-	}
-
-	private void Start()
-	{
-        InvokeRepeating(nameof(Increment), 0, 0.5f);
-	}
-
-    private void Increment()
-	{
-		Length++;
 	}
 }
