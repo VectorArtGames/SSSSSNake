@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SnakeCore.MoveDirection;
 using Assets.Scripts.Player.Extension;
+using Assets.Scripts.Point;
 
 [RequireComponent(typeof(TailHandle))]
 public class SnakeCore : MonoBehaviour
@@ -71,6 +72,8 @@ public class SnakeCore : MonoBehaviour
 		t.localPosition = p;
 		handle.PositionUpdate(p, steps);
 		OnSnakeMove();
+		if (!(PointHandler.Instance is PointHandler pHandle && pHandle.point is Point point)) return;
+		Debug.Log(point.CanCollect(p) ? "Collecting" : "NOPE");
 		Debug.Log("Yes");
 	}
 
@@ -123,6 +126,11 @@ public class SnakeCore : MonoBehaviour
 			t.localPosition =
 				new Vector2((int)t.localPosition.x, (int)border.y + w);
 		}
+	}
+
+	public void CheckPoint()
+	{
+
 	}
 
 	public enum MoveDirection
