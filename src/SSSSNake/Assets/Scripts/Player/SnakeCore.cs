@@ -12,6 +12,7 @@ public class SnakeCore : MonoBehaviour
 {
 	public TailHandle tail;
 	public ScoreTracker score;
+	public DeathScreen deathScreen;
 
 	public float FPS;
 
@@ -35,6 +36,8 @@ public class SnakeCore : MonoBehaviour
 	private void Start()
 	{
 		score = ScoreTracker.Instance;
+		deathScreen = DeathScreen.Instance;
+
 		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / FPS);
 	}
 
@@ -67,7 +70,10 @@ public class SnakeCore : MonoBehaviour
 		if (!(tail is TailHandle handle)) return;
 		if (!tail.Tails.CanMove(p))
 		{
-			Debug.Log("No");
+			#if UNITY_EDITOR
+				Debug.Log("No");
+			#endif
+			deathScreen.OnDeath();
 			return;
 		}
 
@@ -129,9 +135,12 @@ public class SnakeCore : MonoBehaviour
 		}
 	}
 
-	public void CheckPoint()
+	public void Restart()
 	{
-
+		if (!(tail is TailHandle handle)) return;
+		handle.Positions = new List<Vector2>();
+		transform.localPosition = Vector2.zero;
+		score.Score = handle.Length = 0;
 	}
 
 	public enum MoveDirection

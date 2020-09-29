@@ -19,6 +19,16 @@ public class PointHandler : MonoBehaviour
 
 	#endregion
 
+	#region Constant Values
+
+	/// <summary>
+	/// Max Points for each point
+	/// </summary>
+	public const int MaxPoints = 255;
+
+	#endregion
+
+
 	public GameObject PointPrefab;
 
 	public SnakeCore core;
@@ -28,19 +38,21 @@ public class PointHandler : MonoBehaviour
 
 	public BorderField border;
 
+	/// <summary>
+	/// Time since last collect
+	/// </summary>
+	private DateTime TimeCollect = DateTime.Now;
+
 	// Start is called before the first frame update
     public void Start()
     {
 	    border = BorderField.Instance;
 		core = SnakeCore.Instance;
 		score = ScoreTracker.Instance;
-    }
 
-    private void LateUpdate()
-    {
-	    if (point != null) return;
-		NewPoint();
-    }
+		if (point == null)
+			NewPoint();
+	}
 
 	private void OnCollect(object sender, EventArgs e)
 	{
@@ -50,12 +62,21 @@ public class PointHandler : MonoBehaviour
 			return;
 		}
 
+		var time = DateTime.Now;
+		var calculatedScore = Mathf.CeilToInt(MaxPoints / Mathf.Max(1f, (float)(time - TimeCollect).TotalSeconds));
+		#if UNITY_EDITOR
+			Debug.Log($"Score: {calculatedScore}");
+		#endif
+
 		handle.Length++;
-		score.Score++;
+		score.Score += calculatedScore;
 
 		pnt.OnCollected -= OnCollect;
 		Destroy(pnt.AttachedObject);
-		Debug.Log("Collected!");
+		#if UNITY_EDITOR
+			Debug.Log("Collected!");
+		#endif
+		TimeCollect = time;
 		NewPoint();
 	}
 
@@ -79,7 +100,10 @@ public class PointHandler : MonoBehaviour
 		var rY = Random.Range(-1.0f, 1.0f);
 		var x = (rect.width - 50) * rX;
 		var y = (rect.height - 50) * rY;
-		Debug.Log($"X: {x}, Y: {y}");
+
+		#if UNITY_EDITOR
+			Debug.Log($"X: {x}, Y: {y}");
+		#endif
 
 		var v = new Vector2(x, y);
 
@@ -88,9 +112,9 @@ public class PointHandler : MonoBehaviour
 			tail.x > v.x && tail.x + 50 < v.x && // X
 			tail.y > v.y && tail.y + 50 > v.y
 		);
-
-		if (exists)
-			Debug.LogError($"Exists!\n{v}");
+		#if UNITY_EDITOR
+			if (exists) Debug.LogError($"Exists!\n{v}");
+		#endif
 
 		var pos = exists ? GetLocation() : v;
 
