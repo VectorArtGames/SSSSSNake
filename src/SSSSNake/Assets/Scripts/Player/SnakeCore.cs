@@ -39,6 +39,7 @@ public class SnakeCore : MonoBehaviour
 		deathScreen = DeathScreen.Instance;
 
 		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / FPS);
+		SFXManager.PlayByType(SFXManager.SoundType.Start);
 	}
 
 	// Update is called once per frame
@@ -74,6 +75,7 @@ public class SnakeCore : MonoBehaviour
 				Debug.Log("No");
 			#endif
 			deathScreen.OnDeath();
+			SFXManager.PlayByType(SFXManager.SoundType.Death);
 			return;
 		}
 
@@ -141,6 +143,7 @@ public class SnakeCore : MonoBehaviour
 		handle.Positions = new List<Vector2>();
 		transform.localPosition = Vector2.zero;
 		score.Score = handle.Length = 0;
+		SFXManager.PlayByType(SFXManager.SoundType.Start);
 	}
 
 	public enum MoveDirection

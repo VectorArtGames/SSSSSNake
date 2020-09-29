@@ -39,7 +39,7 @@ public class DeathScreen : MonoBehaviour
 		GameOverScreen.SetActive(true);
 		Time.timeScale = 0;
 		if (ScoreText != null && scoreTracker != null)
-			ScoreText.text = $"Game Over.\nScore: {scoreTracker.Score:00000000}";
+			ScoreText.text = $"Game Over.\nScore:{scoreTracker.Score:00000000}\nHighscore: 00000102";
 
 		State = DeathScreenState.Dead;
 	}

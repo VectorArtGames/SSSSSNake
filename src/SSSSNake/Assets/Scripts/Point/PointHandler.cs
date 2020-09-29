@@ -8,6 +8,8 @@ using Random = UnityEngine.Random;
 
 public class PointHandler : MonoBehaviour
 {
+	public static event EventHandler OnPoint;
+
 	#region Singleton
 
 	public static PointHandler Instance { get; set; }
@@ -77,6 +79,8 @@ public class PointHandler : MonoBehaviour
 			Debug.Log("Collected!");
 		#endif
 		TimeCollect = time;
+		SFXManager.PlayByType(SFXManager.SoundType.Point);
+		OnPoint?.Invoke(this, EventArgs.Empty);
 		NewPoint();
 	}
 
