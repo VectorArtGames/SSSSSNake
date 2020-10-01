@@ -99,7 +99,9 @@ public class PointHandler : MonoBehaviour
 
 	private Vector2 GetLocation()
 	{
-		if (!(border.Border is Rect rect)) return Vector2.zero;
+		if (!(border is BorderField b && b.Border is Rect rect)) 
+			return Vector2.zero;
+
 		var rX = Random.Range(-1.0f, 1.0f);
 		var rY = Random.Range(-1.0f, 1.0f);
 		var x = (rect.width - 50) * rX;

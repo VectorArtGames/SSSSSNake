@@ -46,15 +46,10 @@ namespace Assets.Scripts.Point
 		public bool CanCollect(Vector2 point, Vector2 size)
 		{
 			if (rect == null) return false;
-
-			if (!(rect.rect is Rect r)) return false;
 			var self = new Rect(rect.localPosition, size);
 
 			var status = self.Overlaps(new Rect(point, size));
-			if (status)
-			{
-				Collected = status;
-			}
+			if (status) Collected = true;
 			return status;
 		}
 	}

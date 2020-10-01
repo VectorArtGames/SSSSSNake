@@ -1,9 +1,10 @@
 
 ## In progress
 
-* Fix Countdown at the start of the game.
-* Any SFX in main menu?
+- None
 
 ## Done
 
 + Fixed Death Screen buttons
++ Fix Countdown at the start of the game.
++ SFX in main menu?

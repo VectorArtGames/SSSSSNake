@@ -79,10 +79,10 @@ Highscore: {ScoreTracker.GetHighscore():00000000}";
 	public void Restart()
 	{
 		if (PlayerCore == null) return;
-		PlayerCore.Restart();
 		GameOverScreen.SetActive(false);
 		GameScreen.SetActive(true);
 		Time.timeScale = 1;
+		PlayerCore.Restart();
 		State = DeathScreenState.Game;
 	}
 

@@ -2,14 +2,18 @@
 using Assets.Scripts.Player.Tails;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.Main_Menu.UI.Scripts.Settings;
 using UnityEngine;
 using static SnakeCore.MoveDirection;
 using Assets.Scripts.Player.Extension;
 using Assets.Scripts.Point;
+using TMPro;
+using static SFXManager.SoundType;
 
 [RequireComponent(typeof(TailHandle))]
 public class SnakeCore : MonoBehaviour
 {
+	public TextMeshProUGUI CountdownText;
 	public TailHandle tail;
 	public ScoreTracker score;
 	public DeathScreen deathScreen;
@@ -19,6 +23,8 @@ public class SnakeCore : MonoBehaviour
 	public float w;
 
 	public MoveDirection Direction = Up;
+
+	private bool IsMoving;
 
 	#region Singleton
 
@@ -35,11 +41,37 @@ public class SnakeCore : MonoBehaviour
 	// Start is called before the first frame update
 	private void Start()
 	{
+
 		score = ScoreTracker.Instance;
 		deathScreen = DeathScreen.Instance;
+		StartCoroutine(MakeCountdown());
+	}
 
-		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / FPS);
-		SFXManager.PlayByType(SFXManager.SoundType.Start);
+	public IEnumerator MakeCountdown()
+	{
+		if (CountdownText == null)
+		{
+			#if UNITY_EDITOR
+				Debug.LogError("Countdown is (NULL)\nPlease report to developer.");
+			#endif
+			yield break;
+		}
+
+		if (IsMoving)
+		{
+			IsMoving = false;
+			CancelInvoke(nameof(MovePlayer)); // Stop Player Movement
+		}
+
+		CountdownText.gameObject.SetActive(true);
+		for (var i = 3; i >= 0; i--)
+		{
+			CountdownText.text = $"{(i > 0 ? i.ToString() : "Go!")}";
+			SFXManager.PlayByType(Countdown);
+			yield return new WaitForSeconds(1);
+		}
+		CountdownText.gameObject.SetActive(false);
+		OnStart();
 	}
 
 	// Update is called once per frame
@@ -75,7 +107,7 @@ public class SnakeCore : MonoBehaviour
 				Debug.Log("No");
 			#endif
 			deathScreen.OnDeath();
-			SFXManager.PlayByType(SFXManager.SoundType.Death);
+			SFXManager.PlayByType(Death);
 			return;
 		}
 
@@ -137,13 +169,24 @@ public class SnakeCore : MonoBehaviour
 		}
 	}
 
+	public void OnStart()
+	{
+		Time.timeScale = 1;
+
+		if (IsMoving) return;
+
+		IsMoving = true;
+		InvokeRepeating(nameof(MovePlayer), 0, (float)60 / 60 / SpeedSlider.GetSpeed);
+		SFXManager.PlayByType(SFXManager.SoundType.Start);
+	}
+
 	public void Restart()
 	{
 		if (!(tail is TailHandle handle)) return;
 		handle.Positions = new List<Vector2>();
 		transform.localPosition = Vector2.zero;
 		score.Score = handle.Length = 0;
-		SFXManager.PlayByType(SFXManager.SoundType.Start);
+		StartCoroutine(MakeCountdown());
 	}
 
 	public enum MoveDirection

@@ -24,6 +24,11 @@ public class SFXManager : MonoBehaviour
 
 	public SoundClip[] SoundClips;
 
+	private void Start()
+	{
+		source.volume = VolumeSlider.GetVolume;
+	}
+
 	public IEnumerable<SoundClip> FindBySoundType(SoundType type)
 	{
 		return SoundClips.Where(x => x.soundType == type && x.Sound != null);
@@ -36,14 +41,15 @@ public class SFXManager : MonoBehaviour
 		var sound = sounds?.Random();
 		if (sound == null) return;
 		if (man.source == null) return;
-		man.source.PlayOneShot(sound.Sound);
+		man.source.PlayOneShot(sound.Sound, VolumeSlider.GetVolume);
 	}
 
 	public enum SoundType
 	{
 		Point,
 		Death,
-		Start
+		Start,
+		Countdown
 	}
 }
 
